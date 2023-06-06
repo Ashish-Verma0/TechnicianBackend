@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     pinCode: {
       type: String,
+      required: true,
     },
     isAdmin: {
       type: Boolean,

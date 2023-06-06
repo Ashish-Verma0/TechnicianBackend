@@ -10,7 +10,7 @@ mongoose.connection.on("end", () => {
 
 const startDatabase = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/technician", {
+    await mongoose.connect("mongodb://127.0.0.1/technician", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

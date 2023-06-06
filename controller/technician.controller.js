@@ -6,7 +6,6 @@ const ApiFeatures = require("../utils/apiFeatures");
 
 const createTechnician = async (req, res, next) => {
   try {
-    console.log(req.body);
     const tech = await techDatabase.create({
       ...req.body,
       // avatar: req.file.filename,
@@ -29,6 +28,7 @@ const createTechnician = async (req, res, next) => {
 const getAllTech = async (req, res, next) => {
   try {
     const resultPerPage = 8;
+
     const apiFeatures = new ApiFeatures(techDatabase.find(), req.query)
       .search()
       .pagination(resultPerPage);
@@ -40,7 +40,7 @@ const getAllTech = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Data found Successfully",
+      message: "Data found successfully",
       data: tech,
     });
   } catch (error) {

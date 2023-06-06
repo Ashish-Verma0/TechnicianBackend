@@ -14,6 +14,10 @@ const bookingSchema = new mongoose.Schema({
   endTime: {
     type: Date,
   },
+  resolved: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("bookingDatabase", bookingSchema);

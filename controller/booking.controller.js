@@ -1,5 +1,6 @@
 const techDatabase = require("../model/technician.model");
 const bookingDatabase = require("../model/booking.model");
+const BookingComplete = require("../model/bookingCompleteOtp.model");
 
 const createBooking = async (req, res, next) => {
   try {
@@ -45,6 +46,80 @@ const createBooking = async (req, res, next) => {
   }
 };
 
+const getAllBooking = async (req, res, next) => {
+  try {
+    const bookings = await bookingDatabase.find({ customer: req.user.id });
+
+    if (!bookings) {
+      res.status(404).json({
+        success: false,
+        message: "You have no booking",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bookings,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const BookingCompleteOtp = async (req, res, next) => {
+  try {
+    const otp = Math.floor(1000 + Math.random() * 9000);
+
+    // Save the OTP and its expiration time to the database
+    const expirationTime = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    const otpData = await BookingComplete.create({
+      userId: req.user.id,
+      otp: otp,
+      expiresIn: expirationTime,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Otp send successfully",
+      data: otpData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyOtp = async (req, res, next) => {
+  try {
+    const otp = await BookingComplete.findOne({ otp: req.body.otp });
+
+    if (!otp) {
+      res.status(404).json({
+        success: false,
+        message: "Invalid otp",
+      });
+    }
+
+    const updateQuery = await bookingDatabase.findByIdAndUpdate(
+      req.body.bookingId,
+      { resolved: true },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Scheduled copleted",
+      data: updateQuery,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createBooking,
+  BookingCompleteOtp,
+  verifyOtp,
+  getAllBooking,
 };

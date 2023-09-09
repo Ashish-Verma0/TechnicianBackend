@@ -9,7 +9,7 @@ const path = require("path");
 const { verifyToken } = require("../utils/verifyToken");
 const userRouter = express.Router();
 
-const imageUplaod = multer({
+const imageUpload = multer({
   limits: 1000000000 * 2000000,
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -27,7 +27,7 @@ const imageUplaod = multer({
   }),
 });
 
-userRouter.post("/create", imageUplaod.single("avatar"), createUser);
+userRouter.post("/create", imageUpload.single("avatar"), createUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/me", verifyToken, userLogin);
 

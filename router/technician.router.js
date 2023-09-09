@@ -12,6 +12,9 @@ const {
   verifyTechOtp,
   forgotPassword,
   getAllTech,
+  postComment,
+  updateComment,
+  deleteComment,
 } = require("../controller/technician.controller");
 const { verifyToken, verifyIsAdmin } = require("../utils/verifyToken");
 const techRouter = express.Router();
@@ -38,6 +41,9 @@ techRouter.post("/create", imageUplaod.single("adhar"), createTechnician);
 techRouter.post("/login", loginTechnician);
 techRouter.get("/all/tech", getAllTech);
 techRouter.get("/me", verifyToken, technicianProfile);
+techRouter.post("/comment/:techId", verifyToken, postComment);
+techRouter.post("/comment/:techId/:commentId", verifyToken, deleteComment);
+techRouter.put("/comment/:techId/:commentId", verifyToken, updateComment);
 techRouter.get("/:id", findTechnicianById);
 techRouter.put(
   "/update",

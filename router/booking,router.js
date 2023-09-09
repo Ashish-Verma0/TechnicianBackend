@@ -10,8 +10,8 @@ const {
 const bookingRouter = express.Router();
 
 bookingRouter.post("/create", verifyToken, createBooking);
-bookingRouter.post("/create/otp", verifyToken, BookingCompleteOtp);
+bookingRouter.get("/create/otp", verifyToken, BookingCompleteOtp);
 bookingRouter.post("/verify/otp", verifyToken, verifyOtp);
-bookingRouter.get("/all/booking", verifyToken, getAllBooking);
+bookingRouter.get("/all", verifyToken, getAllBooking);
 
 module.exports = bookingRouter;

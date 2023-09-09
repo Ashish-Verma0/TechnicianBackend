@@ -1,6 +1,8 @@
 const techDatabase = require("../model/technician.model");
 const bookingDatabase = require("../model/booking.model");
 const BookingComplete = require("../model/bookingCompleteOtp.model");
+const userDatabase = require("../model/user.model");
+const sendEmail = require("../utils/sendEmail");
 
 const createBooking = async (req, res, next) => {
   try {
@@ -41,6 +43,12 @@ const createBooking = async (req, res, next) => {
     await technician.save();
 
     res.json({ message: "Booking successful", booking });
+    console.log(booking._id);
+    await sendEmail({
+      email: technician?.email,
+      subject: `User Booking Details`,
+      message: `your Booking Customer Id is ${booking?._id}`,
+    });
   } catch (error) {
     next(error);
   }
@@ -49,7 +57,7 @@ const createBooking = async (req, res, next) => {
 const getAllBooking = async (req, res, next) => {
   try {
     const bookings = await bookingDatabase.find({ customer: req.user.id });
-
+    console.log(bookings);
     if (!bookings) {
       res.status(404).json({
         success: false,
@@ -57,7 +65,7 @@ const getAllBooking = async (req, res, next) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: bookings,
     });
@@ -68,6 +76,7 @@ const getAllBooking = async (req, res, next) => {
 
 const BookingCompleteOtp = async (req, res, next) => {
   try {
+    const user = await userDatabase.findById(req.user.id);
     const otp = Math.floor(1000 + Math.random() * 9000);
 
     // Save the OTP and its expiration time to the database
@@ -83,6 +92,11 @@ const BookingCompleteOtp = async (req, res, next) => {
       success: true,
       message: "Otp send successfully",
       data: otpData,
+    });
+    await sendEmail({
+      email: user?.email,
+      subject: `Verifying Otp Code`,
+      message: `your Booking code otp code is ${otp}`,
     });
   } catch (error) {
     next(error);

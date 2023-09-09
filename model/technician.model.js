@@ -52,10 +52,7 @@ const techSchema = new mongoose.Schema(
       required: true,
     },
 
-    skills: {
-      type: Array,
-      required: true,
-    },
+    skills: [],
 
     city: {
       type: String,
@@ -86,7 +83,10 @@ const techSchema = new mongoose.Schema(
         comment: {
           type: String,
         },
-        postedBy: { type: String },
+        postedBy: {
+          type: String,
+          required: true,
+        },
       },
     ],
     schedule: [

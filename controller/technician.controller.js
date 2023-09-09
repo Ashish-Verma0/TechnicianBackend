@@ -8,8 +8,9 @@ const createTechnician = async (req, res, next) => {
   try {
     const tech = await techDatabase.create({
       ...req.body,
+      skills: JSON.parse(req.body.skills),
       // avatar: req.file.filename,
-      adhar: req.file.filename,
+      adhar: req?.file?.filename,
     });
     if (!tech) {
       return next(createError(500, "something went wrong"));
@@ -54,7 +55,7 @@ const loginTechnician = async (req, res, next) => {
 
     const tech = await techDatabase.findOne({ email }).select("+password");
 
-    const isPassword = await tech.comparePassword(password);
+    const isPassword = await tech?.comparePassword(password);
     if (!tech || !isPassword) {
       return next(createError(404, "User Not Found"));
     }
@@ -77,6 +78,74 @@ const technicianProfile = async (req, res, next) => {
       success: true,
       message: "Technician Login Successfully",
       data: tech,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const postComment = async (req, res, next) => {
+  try {
+    const commentsData = {
+      comment: req.body.comment,
+      postedBy: req.user.id,
+    };
+
+    const commentData = await techDatabase.findByIdAndUpdate(
+      req.params.techId,
+      {
+        $push: { comments: commentsData },
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Comment Post Successfully",
+      data: commentData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteComment = async (req, res, next) => {
+  try {
+    const commentData = await techDatabase.findByIdAndUpdate(
+      req.params.techId,
+      {
+        $pull: { comments: { _id: req.params.commentId } },
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Comment Post Successfully",
+      data: commentData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const updateComment = async (req, res, next) => {
+  try {
+    const updatedTechnician = await techDatabase.findOneAndUpdate(
+      { _id: req.params.techId, "comments._id": req.params.commentId },
+      { $set: { "comments.$.comment": req.body.comment } },
+      { new: true }
+    );
+
+    if (!updatedTechnician) {
+      return next(createError(404, "comment is not found"));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Comment updated successfully",
+      data: updatedTechnician,
     });
   } catch (error) {
     next(error);
@@ -240,4 +309,7 @@ module.exports = {
   verifyEmail,
   verifyTechOtp,
   forgotPassword,
+  postComment,
+  deleteComment,
+  updateComment,
 };
